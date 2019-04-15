@@ -1,0 +1,10 @@
+---
+
+version: '2'
+services:
+  configure:
+    image: chn-config
+    build:
+      context: .
+    volumes:
+      - './config/sysconfig:/config:z'

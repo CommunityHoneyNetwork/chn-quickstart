@@ -4,6 +4,7 @@ import argparse
 import validators
 import secrets
 import string
+import os
 
 
 def generate_password(length=32):
@@ -40,6 +41,14 @@ def parse_args():
         default='CERTBOT', choices=certificate_strategies,
         help='Certificate strategy for TLS'
     )
+    parser.add_argument(
+        '-o', '--output-file', required=True,
+        help='File path to write out to'
+    )
+    parser.add_argument(
+        '-f', '--force-overwrite', action='store_true',
+        help='Forcibly overwrite file, even if it exists'
+    )
 
     return parser.parse_args()
 
@@ -47,7 +56,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    chnserver_template = """# Generated from scripts
+    chnserver_template = """# Generated from generate_chn_sysconfig.py
 # This file is read from /etc/sysconfig/chnserver or /etc/default/chnserver
 # depending on the base distro
 #
@@ -87,8 +96,13 @@ CERTIFICATE_STRATEGY='{certificate_strategy}'
         certificate_strategy=args.certificate_strategy
     )
 
-    print(chnserver_template)
-    return 0
+    if not os.path.exists(args.output_file) or args.force_overwrite:
+        f = open(args.output_file, 'w')
+        f.write(chnserver_template)
+        f.close()
+        print("Wrote file to %s" % args.output_file)
+    else:
+        sys.stderr.write("Not writing file, add -f to override\n")
 
 
 if __name__ == "__main__":
