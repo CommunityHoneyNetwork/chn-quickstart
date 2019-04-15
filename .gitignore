@@ -1,5 +1,9 @@
 # Files specific to this project
 config/sysconfig/chnserver.sysconfig
+certs/*
+storage/chnserver/
+storage/mongodb/
+storage/redis/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,6 +1,19 @@
 ---
 version: '2'
 services:
+  configure:
+    image: chn-config
+    build:
+      context: .
+    volumes:
+      - './config/sysconfig:/config:z'
+    entrypoint:
+      - "/code/scripts/generate_chn_sysconfig.py"
+      - "-o"
+      - "/config/chnserver.sysconfig"
+      - "-s"
+      - "https://YOUR_URL_HERE.com"
+      - "-f"
   mongodb:
     image: stingar/mongodb:1.7
     volumes:
@@ -22,10 +35,12 @@ services:
       - hpfeeds:hpfeeds
   chnserver:
     image: stingar/chn-server:1.7
+    depends_on:
+      - configure
     volumes:
       - ./config/collector:/etc/collector:z
       - ./storage/chnserver/sqlite:/opt/sqlite:z
-      - ./chnserver.sysconfig:/etc/default/chnserver:z
+      - ./config/sysconfig/chnserver.sysconfig:/etc/default/chnserver:z
       - ./certs:/etc/letsencrypt:z
     links:
       - mongodb:mongodb

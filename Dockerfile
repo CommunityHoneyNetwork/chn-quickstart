@@ -16,4 +16,4 @@ RUN apt-get install -y python3-pip
 
 RUN pip3 install -r /code/requirements.txt
 
-ENTRYPOINT [ "/code/scripts/generate_chn_sysconfig.py", "-s", "https://myhome.com", "-o", "/config/chnserver.sysconfig" ]
+ENTRYPOINT [ "/code/scripts/generate_chn_sysconfig.py", "-o", "/config/chnserver.sysconfig", "-s", "https://myhome.com" ]
