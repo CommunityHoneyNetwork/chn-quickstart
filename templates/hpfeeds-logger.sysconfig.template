@@ -1,0 +1,42 @@
+# This file is read from /etc/sysconfig/hpfeeds-logger
+# or /etc/default/hpfeeds-logger, depending on the distro version
+#
+# Defaults here are for containers, but can be adjusted
+# after install for a regular server or to customize the containers
+
+MONGODB_HOST="mongodb"
+MONGODB_PORT=27017
+
+# Log to local file; the path is internal to the container and the host filesystem
+# location is controlled by volume mapping in the docker-compose.yml
+FILELOG_ENABLED="true"
+LOG_FILE="/var/log/hpfeeds-logger/chn-splunk.log"
+
+# Choose to rotate the log file based on 'size'(default) or 'time'
+ROTATION_STRATEGY="size"
+
+# If rotating by 'size', the number of MB to rotate at
+ROTATION_SIZE_MAX=100
+
+# If rotating by 'time', the number of hours to rotate at
+ROTATION_TIME_MAX=24
+
+# Log to syslog
+SYSLOG_ENABLED=false
+SYSLOG_HOST=localhost
+SYSLOG_PORT=514
+SYSLOG_FACILITY=user
+
+# Options are arcsight, json, raw_json, splunk
+FORMATTER_NAME={log_format}
+
+# To log data from an external HPFeeds stream, uncomment and fill out these
+# variables. Additionally, change the HPFEEDS_* variables to point to the
+# remote service.
+
+# IDENT=
+# SECRET=
+# CHANNELS=
+
+HPFEEDS_HOST='hpfeeds'
+HPFEEDS_PORT=10000
