@@ -34,7 +34,7 @@ FORMATTER_NAME={log_format}
 # variables. Additionally, change the HPFEEDS_* variables to point to the
 # remote service.
 
-# IDENT=
+IDENT=hpfeeds-logger-{ident}
 # SECRET=
 # CHANNELS=
 

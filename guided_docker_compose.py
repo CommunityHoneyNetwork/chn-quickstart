@@ -139,13 +139,15 @@ def main():
                            template_file="templates/hpfeeds-cif.sysconfig.template",
                            cif_server_url=cif_server_url,
                            cif_token=cif_token,
-                           cif_org=cif_org)
+                           cif_org=cif_org,
+                           ident=generate_password(8))
         f = open('templates/docker-compose-cif.yml.template', 'r')
         template = f.read()
         f.close()
 
         compose = open('docker-compose.yml', 'a')
         compose.write(template)
+        compose.write("\n")
         compose.close()
         print("Updated docker-compose.yml")
 
@@ -188,13 +190,15 @@ def main():
 
         generate_sysconfig(output_file="config/sysconfig/hpfeeds-logger.sysconfig",
                            template_file="templates/hpfeeds-logger.sysconfig.template",
-                           log_format=log_format)
+                           log_format=log_format,
+                           ident=generate_password(8))
         f = open('templates/docker-compose-log.yml.template', 'r')
         template = f.read()
         f.close()
 
         compose = open('docker-compose.yml', 'a')
         compose.write(template)
+        compose.write("\n")
         compose.close()
         print("Updated docker-compose.yml")
     return 0

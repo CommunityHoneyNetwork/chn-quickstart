@@ -1,6 +1,5 @@
   hpfeeds-cif:
     image: stingar/hpfeeds-cif:1.7
-    privileged: true
     volumes:
       - ./config/sysconfig/hpfeeds-cif.sysconfig:/etc/default/hpfeeds-cif
     links:
