@@ -7,7 +7,7 @@ services:
       context: .
     volumes:
       - './config/sysconfig:/config:z'
-    entrypoint: ['/code/scripts/generate_chn_sysconfig.py', '-o', '/config/chnserver.sysconfig', '-s', 'https://EXAMPLE.com', '-f']
+    entrypoint: {entrypoint}
   mongodb:
     image: stingar/mongodb:1.7
     volumes:

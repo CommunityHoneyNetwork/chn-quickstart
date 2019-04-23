@@ -5,6 +5,6 @@ documentation [here](https://communityhoneynetwork.readthedocs.io/en/stable/quic
 
 ## Possible new quickstart
 
-* Edit docker-compose.yml and change the entrypoint for the chn-config image to your public URL
+* Run `./guided_docker_compose.py`
 
 * Run `docker-compose up`
