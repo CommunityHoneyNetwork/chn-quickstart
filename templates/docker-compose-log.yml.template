@@ -1,0 +1,8 @@
+  hpfeeds-logger:
+    image: stingar/hpfeeds-logger:1.7
+    volumes:
+      - ./config/sysconfig/hpfeeds-logger.sysconfig:/etc/default/hpfeeds-logger
+      - ./storage/hpfeeds-logs:/var/log/hpfeeds-logger:z
+    links:
+      - hpfeeds:hpfeeds
+      - mongodb:mongodb
