@@ -170,7 +170,7 @@ def configure_hpfeeds_logger():
             sys.stderr.write(
                 make_color(
                     "FAIL", "You must use one of %s\n" %
-                            log_format.keys()))
+                            logging_formats.keys()))
             log_format = None
 
     generate_sysconfig(output_file="config/sysconfig/hpfeeds-logger.sysconfig",
@@ -186,7 +186,7 @@ def main():
     reconfig = False
     if chn_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous chn-server.sysconfig file detected. Do you wish to reconfigure? [Y/n]: "))
+                                  "Previous chn-server.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
 
     if reconfig or not chn_sysconfig_exists:
@@ -201,11 +201,11 @@ def main():
     enable_cif = False
     if cif_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous hpfeeds-cif.sysconfig file detected. Do you wish to reconfigure? [Y/n]: "))
+                                  "Previous hpfeeds-cif.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
     else:
         answer = input(make_color("BOLD",
-                                  "Do you wish to enable logging to a remote CIFv3 server? [Y/n]: "))
+                                  "Do you wish to enable logging to a remote CIFv3 server? [y/N]: "))
         enable_cif = answer.lower() == ("y" or "yes")
 
     if enable_cif or reconfig:
@@ -221,11 +221,11 @@ def main():
     enable_logger = False
     if logger_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous hpfeeds-logger.sysconfig file detected. Do you wish to reconfigure? [Y/n]: "))
+                                  "Previous hpfeeds-logger.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
     else:
         answer = input(make_color("BOLD",
-                                  "Do you wish to enable logging to a local file? [Y/n]: "))
+                                  "Do you wish to enable logging to a local file? [y/N]: "))
         enable_logger = answer.lower() == ("y" or "yes")
 
     if enable_logger or reconfig:
