@@ -57,8 +57,18 @@ def generate_sysconfig(output_file, template_file, force_overwrite=True, **kwarg
         sys.stderr.write("Not writing file, add -f to override\n")
 
 
-def main():
+def write_docker_compose(template_file, output_file, mode='w'):
+    f = open(template_file, 'r')
+    template = f.read()
+    f.close()
 
+    compose = open(output_file, mode)
+    compose.write(template)
+    compose.write("\n")
+    compose.close()
+
+
+def configure_chn():
     print(
         make_color(
             "BOLD",
@@ -83,14 +93,14 @@ def main():
     while not cert_strategy:
         certificate_strategies = {
             'CERTBOT':
-            ('Signed certificate by an ACME provider such as LetsEncrypt.  '
-             'Most folks will want to use this.  You must ensure your URL is '
-             'accessable from the ACME hosts for verification here'),
+                ('Signed certificate by an ACME provider such as LetsEncrypt.  '
+                 'Most folks will want to use this.  You must ensure your URL is '
+                 'accessable from the ACME hosts for verification here'),
             'BYO':
-            ("Bring Your Own.  Use this if you already have a signed cert"
-             ", or if you want a real certificate without CertBot"),
+                ("Bring Your Own.  Use this if you already have a signed cert"
+                 ", or if you want a real certificate without CertBot"),
             'SELFSIGNED':
-            "Generate a simple self-signed certificate"
+                "Generate a simple self-signed certificate"
         }
         print(
             make_color(
@@ -107,7 +117,7 @@ def main():
             sys.stderr.write(
                 make_color(
                     "FAIL", "You must use one of %s\n" %
-                    certificate_strategies.keys()))
+                            certificate_strategies.keys()))
             cert_strategy = None
 
     generate_sysconfig(output_file="config/sysconfig/chnserver.sysconfig",
@@ -116,93 +126,114 @@ def main():
                        password=generate_password(),
                        certificate_strategy=cert_strategy)
 
-    # Load in template
-    f = open('templates/docker-compose.yml.template', 'r')
-    template = f.read()
-    f.close()
 
-    compose = open('docker-compose.yml', 'w')
-    compose.write(template)
-    compose.close()
-    print("Wrote docker-compose.yml")
+def configure_hpfeeds_cif():
+    cif_server_url = input('Please enter the URL for the remote CIFv3 server: ')
+    cif_token = input('Please enter the API token for the remote CIFv3 server: ')
+    cif_org = input('Please enter a name you wish to be associated with your organization: ')
 
-    print()
+    generate_sysconfig(output_file="config/sysconfig/hpfeeds-cif.sysconfig",
+                       template_file="templates/hpfeeds-cif.sysconfig.template",
+                       cif_server_url=cif_server_url,
+                       cif_token=cif_token,
+                       cif_org=cif_org,
+                       ident=generate_password(8))
 
-    cif_logging_enabled = input(make_color("BOLD",
-                                           "Do you wish to enable logging to a remote CIFv3 server? [Y/n]: "))
-    if cif_logging_enabled.lower() == ("y" or "yes"):
-        cif_server_url = input('Please enter the URL for the remote CIFv3 server: ')
-        cif_token = input('Please enter the API token for the remote CIFv3 server: ')
-        cif_org = input('Please enter a name you wish to be associated with your organization: ')
 
-        generate_sysconfig(output_file="config/sysconfig/hpfeeds-cif.sysconfig",
-                           template_file="templates/hpfeeds-cif.sysconfig.template",
-                           cif_server_url=cif_server_url,
-                           cif_token=cif_token,
-                           cif_org=cif_org,
-                           ident=generate_password(8))
-        f = open('templates/docker-compose-cif.yml.template', 'r')
-        template = f.read()
-        f.close()
-
-        compose = open('docker-compose.yml', 'a')
-        compose.write(template)
-        compose.write("\n")
-        compose.close()
-        print("Updated docker-compose.yml")
-
-    print()
-
-    local_logging_enabled = input(make_color("BOLD",
-                                             "Do you wish to enable logging to a local file? [Y/n]: "))
-    if local_logging_enabled.lower() == ("y" or "yes"):
-        log_format = None
-        while not log_format:
-            logging_formats = {
-                'splunk':
+def configure_hpfeeds_logger():
+    log_format = None
+    while not log_format:
+        logging_formats = {
+            'splunk':
                 'Comma delimited key/value logging format for use with Splunk',
-                'json':
+            'json':
                 "JSON formatted log format",
-                'arcsight':
+            'arcsight':
                 "Log format for use with ArcSight SIEM appliances",
-                'json_raw':
+            'json_raw':
                 ("Raw JSON output from hpfeeds. More verbose that other formats,",
                  "but also not normalized. Can generate a large amount of data.")
-            }
-            print(
-                make_color(
-                    "BOLD",
-                    "Please enter a Certificate Strategy.  This should be one of:")
-            )
+        }
+        print(
+            make_color(
+                "BOLD",
+                "Please enter a Certificate Strategy.  This should be one of:")
+        )
 
+        print()
+        for fmt, fmt_help in logging_formats.items():
+            print("%s: %s" % (fmt, fmt_help))
+
+        log_format = input('Logging Format: ')
+        if log_format not in logging_formats.keys():
             print()
-            for fmt, fmt_help in logging_formats.items():
-                print("%s: %s" % (fmt, fmt_help))
+            sys.stderr.write(
+                make_color(
+                    "FAIL", "You must use one of %s\n" %
+                            log_format.keys()))
+            log_format = None
 
-            log_format = input('Logging Format: ')
-            if log_format not in logging_formats.keys():
-                print()
-                sys.stderr.write(
-                    make_color(
-                        "FAIL", "You must use one of %s\n" %
-                                log_format.keys()))
-                log_format = None
+    generate_sysconfig(output_file="config/sysconfig/hpfeeds-logger.sysconfig",
+                       template_file="templates/hpfeeds-logger.sysconfig.template",
+                       log_format=log_format,
+                       ident=generate_password(8))
 
-        generate_sysconfig(output_file="config/sysconfig/hpfeeds-logger.sysconfig",
-                           template_file="templates/hpfeeds-logger.sysconfig.template",
-                           log_format=log_format,
-                           ident=generate_password(8))
-        f = open('templates/docker-compose-log.yml.template', 'r')
-        template = f.read()
-        f.close()
 
-        compose = open('docker-compose.yml', 'a')
-        compose.write(template)
-        compose.write("\n")
-        compose.close()
-        print("Updated docker-compose.yml")
-    return 0
+def main():
+
+    chn_sysconfig_exists = os.path.exists("config/sysconfig/chnserver.sysconfig")
+
+    reconfig = False
+    if chn_sysconfig_exists:
+        answer = input(make_color("BOLD",
+                                  "Previous chn-server.sysconfig file detected. Do you wish to reconfigure? [Y/n]: "))
+        reconfig = answer.lower() == ("y" or "yes")
+
+    if reconfig or not chn_sysconfig_exists:
+        configure_chn()
+
+    write_docker_compose("templates/docker-compose.yml.template", "docker-compose.yml", 'w')
+
+    # Check if user wants to enable hpfeeds-cif
+    cif_sysconfig_exists = os.path.exists("config/sysconfig/hpfeeds-cif.sysconfig")
+
+    reconfig = False
+    enable_cif = False
+    if cif_sysconfig_exists:
+        answer = input(make_color("BOLD",
+                                  "Previous hpfeeds-cif.sysconfig file detected. Do you wish to reconfigure? [Y/n]: "))
+        reconfig = answer.lower() == ("y" or "yes")
+    else:
+        answer = input(make_color("BOLD",
+                                  "Do you wish to enable logging to a remote CIFv3 server? [Y/n]: "))
+        enable_cif = answer.lower() == ("y" or "yes")
+
+    if enable_cif or reconfig:
+        configure_hpfeeds_cif()
+
+    if enable_cif or reconfig or cif_sysconfig_exists:
+        write_docker_compose("templates/docker-compose-cif.yml.template", "docker-compose.yml", 'a')
+
+    # Check if user wants to enable hpfeeds-logger
+    logger_sysconfig_exists = os.path.exists("config/sysconfig/hpfeeds-logger.sysconfig")
+
+    reconfig = False
+    enable_logger = False
+    if logger_sysconfig_exists:
+        answer = input(make_color("BOLD",
+                                  "Previous hpfeeds-logger.sysconfig file detected. Do you wish to reconfigure? [Y/n]: "))
+        reconfig = answer.lower() == ("y" or "yes")
+    else:
+        answer = input(make_color("BOLD",
+                                  "Do you wish to enable logging to a local file? [Y/n]: "))
+        enable_logger = answer.lower() == ("y" or "yes")
+
+    if enable_logger or reconfig:
+        configure_hpfeeds_logger()
+
+    if enable_logger or reconfig or logger_sysconfig_exists:
+        write_docker_compose("templates/docker-compose-log.yml.template", "docker-compose.yml", 'a')
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
