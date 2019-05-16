@@ -6,6 +6,7 @@ import argparse
 import validators
 import secrets
 import string
+from urllib.parse import urlparse
 
 
 def make_color(color, msg):
@@ -44,6 +45,28 @@ def check_url(url):
         raise argparse.ArgumentTypeError("%s is an invalid url" % url)
 
 
+def check_cert_strategy(certificate_strategy, domain):
+    """
+    If it's an IP addr or localhost, certbot won't issue a cert, so set SELFSIGNED if it matches one of those
+    """
+    # we assume they know what they're doing if they've elected to bring their own cert
+    if certificate_strategy == 'BYO' or certificate_strategy == 'SELFSIGNED':
+        return certificate_strategy
+    if (validators.ip_address.ipv4(domain) or
+            validators.ip_address.ipv6(domain) or
+            domain.startswith('localhost')):
+        # "Selected cert strategy was CERTBOT but detected IP address or localhost for Base URL\n"
+        print(
+            make_color(
+                "BOLD",
+                "Overriding cert strategy to SELFSIGNED since certbot won't issue for IP addresses or localhost")
+        )
+        print()
+        return 'SELFSIGNED'
+    else:
+        return certificate_strategy
+
+
 def generate_sysconfig(output_file, template_file, force_overwrite=True, **kwargs):
     with open(template_file) as sysconfig_template_file:
         template = sysconfig_template_file.read().format(**kwargs)
@@ -72,8 +95,8 @@ def configure_chn():
     print(
         make_color(
             "BOLD",
-            ("Please enter the domain for your CHN Instance.  Note that this "
-             "must be a resolvable domain.")))
+            ("Please enter the URL where you'd like your CHN web console available.  Note that the "
+             "domain must be resolvable. E.g.: sub.domain.tld or localhost/chn.")))
     domain = None
     cert_strategy = None
 
@@ -81,13 +104,18 @@ def configure_chn():
 
     while not domain:
         domain = input('Domain: ')
-
+        # if it's a bare fqdn, prepend the proto scheme https so we can use urlparse
+        # without a scheme, urlparse puts the full url + path all in netloc attribute of its return object
+        # that makes it difficult later to determine if there's a custom path in the url
+        if not domain.startswith('http'):
+            domain = 'https://' + domain
+        url_parsed = urlparse(domain)
         try:
-            socket.gethostbyname(domain)
+            socket.gethostbyname(url_parsed.netloc)
         except Exception as e:
             sys.stderr.write(
                 make_color("FAIL",
-                           "%s is not an active domain name\n" % domain))
+                           "%s is not an active domain name\n" % url_parsed.netloc))
             domain = None
 
     while not cert_strategy:
@@ -122,15 +150,21 @@ def configure_chn():
 
     generate_sysconfig(output_file="config/sysconfig/chnserver.sysconfig",
                        template_file="templates/chn_server.sysconfig.template",
-                       server_base_url="https://%s" % domain,
+                       server_base_url="https://%s%s" % (
+                           url_parsed.netloc, url_parsed.path),
                        password=generate_password(),
-                       certificate_strategy=cert_strategy)
+                       certificate_strategy=check_cert_strategy(
+                           cert_strategy, url_parsed.netloc)
+                       )
 
 
 def configure_hpfeeds_cif():
-    cif_server_url = input('Please enter the URL for the remote CIFv3 server: ')
-    cif_token = input('Please enter the API token for the remote CIFv3 server: ')
-    cif_org = input('Please enter a name you wish to be associated with your organization: ')
+    cif_server_url = input(
+        'Please enter the URL for the remote CIFv3 server: ')
+    cif_token = input(
+        'Please enter the API token for the remote CIFv3 server: ')
+    cif_org = input(
+        'Please enter a name you wish to be associated with your organization: ')
 
     generate_sysconfig(output_file="config/sysconfig/hpfeeds-cif.sysconfig",
                        template_file="templates/hpfeeds-cif.sysconfig.template",
@@ -181,7 +215,8 @@ def configure_hpfeeds_logger():
 
 def main():
 
-    chn_sysconfig_exists = os.path.exists("config/sysconfig/chnserver.sysconfig")
+    chn_sysconfig_exists = os.path.exists(
+        "config/sysconfig/chnserver.sysconfig")
 
     reconfig = False
     if chn_sysconfig_exists:
@@ -192,10 +227,12 @@ def main():
     if reconfig or not chn_sysconfig_exists:
         configure_chn()
 
-    write_docker_compose("templates/docker-compose.yml.template", "docker-compose.yml", 'w')
+    write_docker_compose(
+        "templates/docker-compose.yml.template", "docker-compose.yml", 'w')
 
     # Check if user wants to enable hpfeeds-cif
-    cif_sysconfig_exists = os.path.exists("config/sysconfig/hpfeeds-cif.sysconfig")
+    cif_sysconfig_exists = os.path.exists(
+        "config/sysconfig/hpfeeds-cif.sysconfig")
 
     reconfig = False
     enable_cif = False
@@ -212,10 +249,12 @@ def main():
         configure_hpfeeds_cif()
 
     if enable_cif or reconfig or cif_sysconfig_exists:
-        write_docker_compose("templates/docker-compose-cif.yml.template", "docker-compose.yml", 'a')
+        write_docker_compose(
+            "templates/docker-compose-cif.yml.template", "docker-compose.yml", 'a')
 
     # Check if user wants to enable hpfeeds-logger
-    logger_sysconfig_exists = os.path.exists("config/sysconfig/hpfeeds-logger.sysconfig")
+    logger_sysconfig_exists = os.path.exists(
+        "config/sysconfig/hpfeeds-logger.sysconfig")
 
     reconfig = False
     enable_logger = False
@@ -232,7 +271,8 @@ def main():
         configure_hpfeeds_logger()
 
     if enable_logger or reconfig or logger_sysconfig_exists:
-        write_docker_compose("templates/docker-compose-log.yml.template", "docker-compose.yml", 'a')
+        write_docker_compose(
+            "templates/docker-compose-log.yml.template", "docker-compose.yml", 'a')
 
 
 if __name__ == "__main__":
