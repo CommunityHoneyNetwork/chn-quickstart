@@ -18,6 +18,9 @@ ROTATION_STRATEGY="size"
 # If rotating by 'size', the number of MB to rotate at
 ROTATION_SIZE_MAX=100
 
+# If rotating by 'time', the unit to count in; valid values are "m","h", and "d"
+ROTATION_TIME_UNIT=h
+
 # If rotating by 'time', the number of hours to rotate at
 ROTATION_TIME_MAX=24
 
