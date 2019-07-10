@@ -7,7 +7,7 @@ MONGODB_PORT=27017
 
 CIF_HOST='{cif_server_url}'
 CIF_TOKEN='{cif_token}'
-CIF_PROVIDER='{cif_org}-chn'
+CIF_PROVIDER='{cif_org}'
 CIF_TLP='green'
 CIF_CONFIDENCE='8'
 CIF_TAGS='honeypot'
