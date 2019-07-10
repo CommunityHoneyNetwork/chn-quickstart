@@ -185,8 +185,7 @@ def configure_hpfeeds_logger():
             'arcsight':
                 "Log format for use with ArcSight SIEM appliances",
             'json_raw':
-                "Raw JSON output from hpfeeds. More verbose that other formats, "
-                "but also not normalized. Can generate a large amount of data."
+                "Raw JSON output from hpfeeds. More verbose that other formats, but also not normalized. Can generate a large amount of data."
         }
 
         print()
