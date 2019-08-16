@@ -5,8 +5,8 @@ documentation [here](https://communityhoneynetwork.readthedocs.io/en/stable/quic
 
 ## quickstart
 
-* `apt install python3-pip`
-* `pip3 install validators`
+* `sudo apt update && sudo apt upgrade -y && sudo apt install -y docker-compose jq python3 python3-pip && sudo pip3 install validators && sudo usermod -aG docker ubuntu && sudo systemctl enable docker && sudo reboot`
+* `cd /opt && sudo git clone https://github.com/CommunityHoneyNetwork/chn-quickstart.git chnserver && sudo chown -R ubuntu:docker /opt/chnserver`
 * `chmod u+x guided_docker_compose.py`
 * Run `./guided_docker_compose.py`
 
