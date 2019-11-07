@@ -1,0 +1,15 @@
+# This file is read from /etc/default/mnemosyne
+#
+# This can be modified to change the default setup of the unattended installation
+
+HPFEEDS_HOST='hpfeeds'
+HPFEEDS_PORT=10000
+
+MONGODB_HOST='mongodb'
+MONGODB_PORT=27017
+
+# MONGODB_INDEXTTL sets the number of seconds to keep data in the mongo database
+# This default value is 30 days
+MONGODB_INDEXTTL={retention}
+
+IGNORE_RFC1918=False

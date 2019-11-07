@@ -158,6 +158,40 @@ def configure_chn():
                        )
 
 
+def configure_mnemosyne():
+    retention = None
+
+    while not retention:
+        print()
+        print(
+            make_color(
+                "BOLD",
+                "How many days of honeypot data should be maintained in the database (default 30 days)?"
+            )
+        )
+        days_str = input("Number of Days: ")
+        try:
+            days = int(days_str)
+            if days < 1:
+                print(
+                    make_color("FAIL",
+                               "%s is not a valid number of days. Please choose a number greater than zero." % days_str)
+                )
+                continue
+            retention = days * 60 * 60 * 24
+        except ValueError:
+            print(
+                make_color("FAIL",
+                           "%s is not a valid number." % days_str)
+            )
+            retention = None
+
+    generate_sysconfig(output_file="config/sysconfig/mnemosyne.sysconfig",
+                       template_file="templates/mnemosyne.sysconfig.template",
+                       retention=retention
+                       )
+
+
 def configure_hpfeeds_cif():
     cif_server_url = input(
         'Please enter the URL for the remote CIFv3 server: ')
@@ -220,6 +254,7 @@ def main():
 
     if reconfig or not chn_sysconfig_exists:
         configure_chn()
+        configure_mnemosyne()
 
     write_docker_compose(
         "templates/docker-compose.yml.template", "docker-compose.yml", 'w')
