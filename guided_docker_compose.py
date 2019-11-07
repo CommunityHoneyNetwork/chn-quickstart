@@ -123,7 +123,7 @@ def configure_chn():
             'CERTBOT':
                 ('Signed certificate by an ACME provider such as LetsEncrypt.  '
                  'Most folks will want to use this.  You must ensure your URL is '
-                 'accessable from the ACME hosts for verification here'),
+                 'accessible from the ACME hosts for verification here'),
             'BYO':
                 ("Bring Your Own.  Use this if you already have a signed cert"
                  ", or if you want a real certificate without CertBot"),
