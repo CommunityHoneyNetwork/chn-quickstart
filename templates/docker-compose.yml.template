@@ -17,6 +17,8 @@ services:
       - "10000:10000"
   mnemosyne:
     image: stingar/mnemosyne:1.8
+    volumes:
+      - ./config/sysconfig/mnemosyne.sysconfig:/etc/default/mnemosyne:z
     links:
       - mongodb:mongodb
       - hpfeeds:hpfeeds
