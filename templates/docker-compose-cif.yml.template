@@ -5,3 +5,4 @@
     links:
       - hpfeeds:hpfeeds
       - mongodb:mongodb
+      - redis:redis
