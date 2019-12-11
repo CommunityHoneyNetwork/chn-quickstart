@@ -31,7 +31,6 @@ services:
       - ./certs:/etc/letsencrypt:z
     links:
       - mongodb:mongodb
-      - redis:redis
       - hpfeeds:hpfeeds
     ports:
       - "80:80"
