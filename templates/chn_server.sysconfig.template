@@ -3,7 +3,7 @@
 # depending on the base distro
 #
 # This can be modified to change the default setup of the chnserver unattended
-installation
+# installation
 
 DEBUG=false
 
