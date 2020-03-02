@@ -5,9 +5,17 @@ documentation [here](https://communityhoneynetwork.readthedocs.io/en/stable/)
 
 ## 'Quickstart' or 'Documentation is for Chumps'
 
+Install procedure:
+
+* Install docker & docker-compose
+* Ensure python3 & pip3 are available
+* `pip3 install -r requirements`
+* Clone this repository and `cd` into it
+* `./guided_docker_compose.py`
+
 Presuming an AWS Ubuntu instance:
 
-* `sudo apt update && sudo apt upgrade -y && sudo apt install -y docker-compose jq python3 python3-pip && sudo pip3 install validators && sudo usermod -aG docker ubuntu && sudo systemctl enable docker && sudo reboot`
+* `sudo apt update && sudo apt upgrade -y && sudo apt install -y docker-compose jq python3 python3-pip && sudo pip3 install -r requirements.txt && sudo usermod -aG docker ubuntu && sudo systemctl enable docker && sudo reboot`
 * `sudo git clone https://github.com/CommunityHoneyNetwork/chn-quickstart.git /opt/chnserver && sudo chown -R ubuntu:docker /opt/chnserver`
 * Run `cd /opt/chnserver && ./guided_docker_compose.py`
 * Run `docker-compose up`
