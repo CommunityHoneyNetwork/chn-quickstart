@@ -100,7 +100,7 @@ def configure_chn():
     domain = None
     cert_strategy = None
 
-    touch('config/sysconfig/chnserver.sysconfig')
+    touch('config/sysconfig/chnserver.env')
 
     while not domain:
         domain = input('Domain: ')
@@ -148,8 +148,8 @@ def configure_chn():
                             certificate_strategies.keys()))
             cert_strategy = None
 
-    generate_sysconfig(output_file="config/sysconfig/chnserver.sysconfig",
-                       template_file="templates/chn_server.sysconfig.template",
+    generate_sysconfig(output_file="config/sysconfig/chnserver.env",
+                       template_file="templates/chn_server.env.template",
                        server_base_url="https://%s%s" % (
                            url_parsed.netloc, url_parsed.path),
                        password=generate_password(),
@@ -186,8 +186,8 @@ def configure_mnemosyne():
             )
             retention = None
 
-    generate_sysconfig(output_file="config/sysconfig/mnemosyne.sysconfig",
-                       template_file="templates/mnemosyne.sysconfig.template",
+    generate_sysconfig(output_file="config/sysconfig/mnemosyne.env",
+                       template_file="templates/mnemosyne.env.template",
                        retention=retention
                        )
 
@@ -195,18 +195,17 @@ def configure_mnemosyne():
 def configure_hpfeeds_cif():
     cif_server_url = input(
         'Please enter the URL for the remote CIFv3 server: ')
-    cif_token = input(
-        'Please enter the API token for the remote CIFv3 server: ')
+    cif_write_token = input(
+        'Please enter the *write* API token for the remote CIFv3 server: ')
     cif_org = input(
-        'Please enter a name you wish to be associated with your organization: ')
+        'Please enter a name you wish to be associated with your organization (partnerX): ')
 
-    generate_sysconfig(output_file="config/sysconfig/hpfeeds-cif.sysconfig",
-                       template_file="templates/hpfeeds-cif.sysconfig.template",
+    generate_sysconfig(output_file="config/sysconfig/hpfeeds-cif.env",
+                       template_file="templates/hpfeeds-cif.env.template",
                        cif_server_url=cif_server_url,
-                       cif_token=cif_token,
+                       cif_token=cif_write_token,
                        cif_org=cif_org,
                        ident=generate_password(8))
-
 
 def configure_hpfeeds_logger():
     log_format = None
@@ -235,8 +234,8 @@ def configure_hpfeeds_logger():
                             logging_formats.keys()))
             log_format = None
 
-    generate_sysconfig(output_file="config/sysconfig/hpfeeds-logger.sysconfig",
-                       template_file="templates/hpfeeds-logger.sysconfig.template",
+    generate_sysconfig(output_file="config/sysconfig/hpfeeds-logger.env",
+                       template_file="templates/hpfeeds-logger.env.template",
                        log_format=log_format,
                        ident=generate_password(8))
 
@@ -244,12 +243,12 @@ def configure_hpfeeds_logger():
 def main():
 
     chn_sysconfig_exists = os.path.exists(
-        "config/sysconfig/chnserver.sysconfig")
+        "config/sysconfig/chnserver.env")
 
     reconfig = False
     if chn_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous chn-server.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
+                                  "Previous chn-server.env file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
 
     if reconfig or not chn_sysconfig_exists:
@@ -261,13 +260,13 @@ def main():
 
     # Check if user wants to enable hpfeeds-cif
     cif_sysconfig_exists = os.path.exists(
-        "config/sysconfig/hpfeeds-cif.sysconfig")
+        "config/sysconfig/hpfeeds-cif.env")
 
     reconfig = False
     enable_cif = False
     if cif_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous hpfeeds-cif.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
+                                  "Previous hpfeeds-cif.env file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
     else:
         answer = input(make_color("BOLD",
@@ -283,13 +282,13 @@ def main():
 
     # Check if user wants to enable hpfeeds-logger
     logger_sysconfig_exists = os.path.exists(
-        "config/sysconfig/hpfeeds-logger.sysconfig")
+        "config/sysconfig/hpfeeds-logger.env")
 
     reconfig = False
     enable_logger = False
     if logger_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous hpfeeds-logger.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
+                                  "Previous hpfeeds-logger.env file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
     else:
         answer = input(make_color("BOLD",

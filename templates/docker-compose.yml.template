@@ -2,36 +2,35 @@
 version: '2'
 services:
   mongodb:
-    image: stingar/mongodb:1.8
+    image: mongo:3.4.24-xenial
     volumes:
-      - ./storage/mongodb:/var/lib/mongo:z
+      - ./storage/mongodb:/data/db:z
   redis:
-    image: stingar/redis:1.8
+    image: redis:alpine
     volumes:
-      - ./storage/redis:/var/lib/redis:z
-  hpfeeds:
-    image: stingar/hpfeeds:1.8
+      - ./storage/redis:/data:z
+  hpfeeds3:
+    image: stingar/hpfeeds3:1.9
     links:
       - mongodb:mongodb
-    ports:
-      - "10000:10000"
   mnemosyne:
-    image: stingar/mnemosyne:1.8
-    volumes:
-      - ./config/sysconfig/mnemosyne.sysconfig:/etc/default/mnemosyne:z
+    image: stingar/mnemosyne:1.9
+    env_file:
+      - config/sysconfig/mnemosyne.env
     links:
       - mongodb:mongodb
-      - hpfeeds:hpfeeds
+      - hpfeeds3:hpfeeds3
   chnserver:
-    image: stingar/chn-server:1.8
+    image: stingar/chn-server:1.9
     volumes:
       - ./config/collector:/etc/collector:z
       - ./storage/chnserver/sqlite:/opt/sqlite:z
-      - ./config/sysconfig/chnserver.sysconfig:/etc/default/chnserver:z
       - ./certs:/etc/letsencrypt:z
+    env_file:
+      - config/sysconfig/chnserver.env
     links:
       - mongodb:mongodb
-      - hpfeeds:hpfeeds
+      - hpfeeds3:hpfeeds3
     ports:
       - "80:80"
       - "443:443"
