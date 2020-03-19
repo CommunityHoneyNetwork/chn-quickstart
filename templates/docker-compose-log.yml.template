@@ -3,7 +3,7 @@
     volumes:
       - ./storage/hpfeeds-logs:/var/log/hpfeeds-logger:z
     env_file:
-      - config/sysconfig/hpfeeds-logger.
+      - config/sysconfig/hpfeeds-logger.env
     links:
       - hpfeeds3:hpfeeds3
       - mongodb:mongodb
