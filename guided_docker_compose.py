@@ -7,7 +7,7 @@ import validators
 import secrets
 import string
 from urllib.parse import urlparse
-
+import re
 
 def make_color(color, msg):
     bcolors = {
@@ -193,12 +193,31 @@ def configure_mnemosyne():
 
 
 def configure_hpfeeds_cif():
-    cif_server_url = input(
-        'Please enter the URL for the remote CIFv3 server: ')
-    cif_write_token = input(
-        'Please enter the *write* API token for the remote CIFv3 server: ')
-    cif_org = input(
-        'Please enter a name you wish to be associated with your organization (partnerX): ')
+    valid_url = None
+    valid_token = None
+    valid_provider = None
+
+    while not valid_url:
+        print()
+        cif_server_url = input('Please enter the URL for the remote CIFv3 server: ')
+        valid_url = validators.url(cif_server_url)
+        if not valid_url:
+            print('Invalid URL, please ensure the URL includes the scheme (https://)!')
+
+    while not valid_token:
+        print()
+        cif_write_token = input('Please enter the *write* API token for the remote CIFv3 server: ')
+        if re.match('[0-9a-z]{80}', cif_write_token.strip('\n')):
+            valid_token = True
+        else:
+            print('Input provided did not match expected pattern for a CIF API token!')
+
+    while not valid_provider:
+        cif_org = input('Please enter a name you wish to be associated with your organization (partnerX): ')
+        if re.match('[a-zA-Z0-9_-]+', cif_org):
+            valid_provider = True
+        else:
+            print('Input provided is not a valid provider ID; valid character set is [a-zA-Z0-9_-]')
 
     generate_sysconfig(output_file="config/sysconfig/hpfeeds-cif.env",
                        template_file="templates/hpfeeds-cif.env.template",
