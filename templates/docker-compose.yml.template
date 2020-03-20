@@ -13,6 +13,8 @@ services:
     image: stingar/hpfeeds3:1.9
     links:
       - mongodb:mongodb
+    ports:
+      - "10000:10000"
   mnemosyne:
     image: stingar/mnemosyne:1.9
     env_file:
