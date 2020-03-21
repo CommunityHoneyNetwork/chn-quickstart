@@ -5,16 +5,22 @@ services:
     image: mongo:3.4.24-xenial
     volumes:
       - ./storage/mongodb:/data/db:z
+    restart: always
+
   redis:
     image: redis:alpine
     volumes:
       - ./storage/redis:/data:z
+    restart: always
+
   hpfeeds3:
     image: stingar/hpfeeds3:1.9
     links:
       - mongodb:mongodb
     ports:
       - "10000:10000"
+    restart: always
+
   mnemosyne:
     image: stingar/mnemosyne:1.9
     env_file:
@@ -22,6 +28,8 @@ services:
     links:
       - mongodb:mongodb
       - hpfeeds3:hpfeeds3
+    restart: always
+
   chnserver:
     image: stingar/chn-server:1.9
     volumes:
@@ -36,3 +44,4 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    restart: always

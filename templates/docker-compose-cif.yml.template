@@ -6,3 +6,4 @@
       - hpfeeds3:hpfeeds3
       - mongodb:mongodb
       - redis:redis
+    restart: always
