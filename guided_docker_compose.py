@@ -367,12 +367,12 @@ def main():
             "templates/docker-compose-log.yml.template", "docker-compose.yml", 'a')
 
     # Check if user wants to enable hpfeeds-logger
-    logger_feeds_exists = os.path.exists(
+    feeds_exists = os.path.exists(
         "config/sysconfig/chn-intel-feeds.env")
 
     reconfig = False
     enable_feeds = False
-    if logger_feeds_exists:
+    if feeds_exists:
         answer = input(make_color("BOLD",
                                   "Previous chn-intel-feeds.env file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
@@ -382,9 +382,9 @@ def main():
         enable_feeds = answer.lower() == ("y" or "yes")
 
     if enable_feeds or reconfig:
-        configure_hpfeeds_logger()
+        configure_chn_intel_feeds()
 
-    if enable_feeds or reconfig or logger_feeds_exists:
+    if enable_feeds or reconfig or feeds_exists:
         write_docker_compose(
             "templates/docker-compose-chn-intel-feeds.yml.template", "docker-compose.yml", 'a')
 
