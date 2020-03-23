@@ -7,4 +7,3 @@
     links:
       - hpfeeds3:hpfeeds3
       - mongodb:mongodb
-    restart: always
