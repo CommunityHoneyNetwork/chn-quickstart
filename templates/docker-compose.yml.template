@@ -33,14 +33,12 @@ services:
   chnserver:
     image: stingar/chn-server:1.9
     volumes:
-      - ./config/collector:/etc/collector:z
       - ./storage/chnserver/sqlite:/opt/sqlite:z
       - ./certs:/etc/letsencrypt:z
     env_file:
       - ./config/sysconfig/chnserver.env
     links:
       - mongodb:mongodb
-      - hpfeeds3:hpfeeds3
     ports:
       - "80:80"
       - "443:443"
