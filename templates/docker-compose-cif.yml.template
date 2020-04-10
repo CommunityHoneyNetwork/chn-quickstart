@@ -1,8 +1,9 @@
   hpfeeds-cif:
-    image: stingar/hpfeeds-cif:1.8
-    volumes:
-      - ./config/sysconfig/hpfeeds-cif.sysconfig:/etc/default/hpfeeds-cif
+    image: stingar/hpfeeds-cif:1.9
+    env_file:
+      - ./config/sysconfig/hpfeeds-cif.env
     links:
-      - hpfeeds:hpfeeds
+      - hpfeeds3:hpfeeds3
       - mongodb:mongodb
       - redis:redis
+    restart: always

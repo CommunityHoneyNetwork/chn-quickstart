@@ -7,7 +7,7 @@ import validators
 import secrets
 import string
 from urllib.parse import urlparse
-
+import re
 
 def make_color(color, msg):
     bcolors = {
@@ -100,7 +100,7 @@ def configure_chn():
     domain = None
     cert_strategy = None
 
-    touch('config/sysconfig/chnserver.sysconfig')
+    touch('config/sysconfig/chnserver.env')
 
     while not domain:
         domain = input('Domain: ')
@@ -148,8 +148,8 @@ def configure_chn():
                             certificate_strategies.keys()))
             cert_strategy = None
 
-    generate_sysconfig(output_file="config/sysconfig/chnserver.sysconfig",
-                       template_file="templates/chn_server.sysconfig.template",
+    generate_sysconfig(output_file="config/sysconfig/chnserver.env",
+                       template_file="templates/chn_server.env.template",
                        server_base_url="https://%s%s" % (
                            url_parsed.netloc, url_parsed.path),
                        password=generate_password(),
@@ -186,26 +186,89 @@ def configure_mnemosyne():
             )
             retention = None
 
-    generate_sysconfig(output_file="config/sysconfig/mnemosyne.sysconfig",
-                       template_file="templates/mnemosyne.sysconfig.template",
+    generate_sysconfig(output_file="config/sysconfig/mnemosyne.env",
+                       template_file="templates/mnemosyne.env.template",
                        retention=retention
                        )
 
 
 def configure_hpfeeds_cif():
-    cif_server_url = input(
-        'Please enter the URL for the remote CIFv3 server: ')
-    cif_token = input(
-        'Please enter the API token for the remote CIFv3 server: ')
-    cif_org = input(
-        'Please enter a name you wish to be associated with your organization: ')
+    valid_url = None
+    valid_token = None
+    valid_provider = None
 
-    generate_sysconfig(output_file="config/sysconfig/hpfeeds-cif.sysconfig",
-                       template_file="templates/hpfeeds-cif.sysconfig.template",
+    while not valid_url:
+        print()
+        cif_server_url = input('Please enter the URL for the remote CIFv3 server: ')
+        valid_url = validators.url(cif_server_url)
+        if not valid_url:
+            print('Invalid URL, please ensure the URL includes the scheme (https://)!')
+
+    while not valid_token:
+        print()
+        cif_write_token = input('Please enter the *write* API token for the remote CIFv3 server: ')
+        if re.match('[0-9a-z]{80}', cif_write_token.strip('\n')):
+            valid_token = True
+        else:
+            print('Input provided did not match expected pattern for a CIF API token!')
+
+    while not valid_provider:
+        cif_org = input('Please enter a name you wish to be associated with your organization (partnerX): ')
+        if re.match('[a-zA-Z0-9_-]+', cif_org):
+            valid_provider = True
+        else:
+            print('Input provided is not a valid provider ID; valid character set is [a-zA-Z0-9_-]')
+
+    generate_sysconfig(output_file="config/sysconfig/hpfeeds-cif.env",
+                       template_file="templates/hpfeeds-cif.env.template",
                        cif_server_url=cif_server_url,
-                       cif_token=cif_token,
+                       cif_token=cif_write_token,
                        cif_org=cif_org,
                        ident=generate_password(8))
+
+
+def configure_chn_intel_feeds():
+    valid_url = None
+    valid_read_token = None
+    valid_write_token = None
+    valid_provider = None
+
+    while not valid_url:
+        print()
+        cif_server_url = input('Please enter the URL for the remote CIFv3 server: ')
+        valid_url = validators.url(cif_server_url)
+        if not valid_url:
+            print('Invalid URL, please ensure the URL includes the scheme (https://)!')
+
+    while not valid_read_token:
+        print()
+        cif_read_token = input('Please enter the *read* API token for the remote CIFv3 server: ')
+        if re.match('[0-9a-z]{80}', cif_read_token.strip('\n')):
+            valid_read_token = True
+        else:
+            print('Input provided did not match expected pattern for a CIF API token!')
+
+    while not valid_write_token:
+        print()
+        cif_write_token = input('Please enter the *write* API token for the remote CIFv3 server: ')
+        if re.match('[0-9a-z]{80}', cif_write_token.strip('\n')):
+            valid_write_token = True
+        else:
+            print('Input provided did not match expected pattern for a CIF API token!')
+
+    while not valid_provider:
+        cif_org = input('Please enter the name associated with your organization safelist (partnerX): ')
+        if re.match('[a-zA-Z0-9_-]+', cif_org):
+            valid_provider = True
+        else:
+            print('Input provided is not a valid provider ID; valid character set is [a-zA-Z0-9_-]')
+
+    generate_sysconfig(output_file="config/sysconfig/chn-intel-feeds.env",
+                       template_file="templates/chn-intel-feeds.env.template",
+                       cif_server_url=cif_server_url,
+                       cif_write_token=cif_write_token,
+                       cif_read_token=cif_read_token,
+                       cif_org=cif_org)
 
 
 def configure_hpfeeds_logger():
@@ -235,8 +298,8 @@ def configure_hpfeeds_logger():
                             logging_formats.keys()))
             log_format = None
 
-    generate_sysconfig(output_file="config/sysconfig/hpfeeds-logger.sysconfig",
-                       template_file="templates/hpfeeds-logger.sysconfig.template",
+    generate_sysconfig(output_file="config/sysconfig/hpfeeds-logger.env",
+                       template_file="templates/hpfeeds-logger.env.template",
                        log_format=log_format,
                        ident=generate_password(8))
 
@@ -244,12 +307,12 @@ def configure_hpfeeds_logger():
 def main():
 
     chn_sysconfig_exists = os.path.exists(
-        "config/sysconfig/chnserver.sysconfig")
+        "config/sysconfig/chnserver.env")
 
     reconfig = False
     if chn_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous chn-server.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
+                                  "Previous chn-server.env file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
 
     if reconfig or not chn_sysconfig_exists:
@@ -261,13 +324,13 @@ def main():
 
     # Check if user wants to enable hpfeeds-cif
     cif_sysconfig_exists = os.path.exists(
-        "config/sysconfig/hpfeeds-cif.sysconfig")
+        "config/sysconfig/hpfeeds-cif.env")
 
     reconfig = False
     enable_cif = False
     if cif_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous hpfeeds-cif.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
+                                  "Previous hpfeeds-cif.env file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
     else:
         answer = input(make_color("BOLD",
@@ -283,13 +346,13 @@ def main():
 
     # Check if user wants to enable hpfeeds-logger
     logger_sysconfig_exists = os.path.exists(
-        "config/sysconfig/hpfeeds-logger.sysconfig")
+        "config/sysconfig/hpfeeds-logger.env")
 
     reconfig = False
     enable_logger = False
     if logger_sysconfig_exists:
         answer = input(make_color("BOLD",
-                                  "Previous hpfeeds-logger.sysconfig file detected. Do you wish to reconfigure? [y/N]: "))
+                                  "Previous hpfeeds-logger.env file detected. Do you wish to reconfigure? [y/N]: "))
         reconfig = answer.lower() == ("y" or "yes")
     else:
         answer = input(make_color("BOLD",
@@ -302,6 +365,28 @@ def main():
     if enable_logger or reconfig or logger_sysconfig_exists:
         write_docker_compose(
             "templates/docker-compose-log.yml.template", "docker-compose.yml", 'a')
+
+    # Check if user wants to enable hpfeeds-logger
+    feeds_exists = os.path.exists(
+        "config/sysconfig/chn-intel-feeds.env")
+
+    reconfig = False
+    enable_feeds = False
+    if feeds_exists:
+        answer = input(make_color("BOLD",
+                                  "Previous chn-intel-feeds.env file detected. Do you wish to reconfigure? [y/N]: "))
+        reconfig = answer.lower() == ("y" or "yes")
+    else:
+        answer = input(make_color("BOLD",
+                                  "Do you wish to enable intelligence feeds from a remote CIF instance? [y/N]: "))
+        enable_feeds = answer.lower() == ("y" or "yes")
+
+    if enable_feeds or reconfig:
+        configure_chn_intel_feeds()
+
+    if enable_feeds or reconfig or feeds_exists:
+        write_docker_compose(
+            "templates/docker-compose-chn-intel-feeds.yml.template", "docker-compose.yml", 'a')
 
 
 if __name__ == "__main__":

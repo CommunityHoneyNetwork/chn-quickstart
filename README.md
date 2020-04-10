@@ -9,7 +9,7 @@ Install procedure:
 
 * Install docker & docker-compose
 * Ensure python3 & pip3 are available
-* `pip3 install -r requirements`
+* `pip3 install -r requirements.txt`
 * Clone this repository and `cd` into it
 * `./guided_docker_compose.py`
 

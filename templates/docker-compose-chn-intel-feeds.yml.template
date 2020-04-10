@@ -1,0 +1,9 @@
+  chn-intel-feeds:
+    image: stingar/chn-intel-feeds:1.9
+    env_file:
+      - ./config/sysconfig/chn-intel-feeds.env
+    volumes:
+      - ./safelists:/var/www/safelists
+    ports:
+      - 9000:9000
+    restart: always
