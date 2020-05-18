@@ -111,7 +111,7 @@ def configure_chn():
             domain = 'https://' + domain
         url_parsed = urlparse(domain)
         try:
-            socket.gethostbyname(url_parsed.netloc)
+            socket.getaddrinfo(url_parsed.netloc, 443)
         except Exception as e:
             sys.stderr.write(
                 make_color("FAIL",
