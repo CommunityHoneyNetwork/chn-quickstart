@@ -9,13 +9,16 @@ ENV DEBIAN_FRONTEND "noninteractive"
 
 VOLUME /config
 
+# hadolint ignore=DL3008,DL3005
 RUN apt-get update \
-      && apt-get install -y ansible
+    && apt-get install --no-install-recommends -y ansible python3-pip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /code
-ADD . /code
-RUN apt-get install -y python3-pip
+COPY . /code
 
-RUN pip3 install -r /code/requirements.txt
+RUN python3 -m pip install --upgrade pip setuptools wheel \
+  && python3 -m pip install -r /code/requirements.txt
 
 ENTRYPOINT [ "/code/scripts/generate_chn_sysconfig.py", "-o", "/config/chnserver.sysconfig", "-s", "https://myhome.com" ]
