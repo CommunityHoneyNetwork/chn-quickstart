@@ -1,5 +1,5 @@
   hpfeeds-logger:
-    image: stingar/hpfeeds-logger:1.9
+    image: stingar/hpfeeds-logger:1.9.1
     volumes:
       - ./storage/hpfeeds-logs:/var/log/hpfeeds-logger:z
     env_file:

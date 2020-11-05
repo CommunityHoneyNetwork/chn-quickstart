@@ -1,5 +1,5 @@
   chn-intel-feeds:
-    image: stingar/chn-intel-feeds:1.9
+    image: stingar/chn-intel-feeds:1.9.1
     env_file:
       - ./config/sysconfig/chn-intel-feeds.env
     volumes:

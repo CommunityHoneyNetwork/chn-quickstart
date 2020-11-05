@@ -1,5 +1,5 @@
   hpfeeds-cif:
-    image: stingar/hpfeeds-cif:1.9
+    image: stingar/hpfeeds-cif:1.9.1
     env_file:
       - ./config/sysconfig/hpfeeds-cif.env
     links:

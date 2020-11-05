@@ -14,7 +14,7 @@ services:
     restart: always
 
   hpfeeds3:
-    image: stingar/hpfeeds3:1.9
+    image: stingar/hpfeeds3:1.9.1
     links:
       - mongodb:mongodb
     ports:
@@ -22,7 +22,7 @@ services:
     restart: always
 
   mnemosyne:
-    image: stingar/mnemosyne:1.9
+    image: stingar/mnemosyne:1.9.1
     env_file:
       - ./config/sysconfig/mnemosyne.env
     links:
@@ -31,7 +31,7 @@ services:
     restart: always
 
   chnserver:
-    image: stingar/chn-server:1.9
+    image: stingar/chn-server:1.9.1
     volumes:
       - ./storage/chnserver/sqlite:/opt/sqlite:z
       - ./certs:/etc/letsencrypt:z
