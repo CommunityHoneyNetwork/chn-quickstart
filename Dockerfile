@@ -1,9 +1,9 @@
 FROM ubuntu:18.04
 
-LABEL maintainer Drew Stinnett <drew.stinnett@duke.edu>
-LABEL name "chn-config"
-LABEL version "0.1"
-LABEL release "1"
+LABEL maintainer="Team Stingar <team-stingar@duke.edu>"
+LABEL name="chn-config"
+LABEL version="1.9.1"
+LABEL release="1"
 # hadolint ignore=DL3008,DL3005
 ENV DEBIAN_FRONTEND "noninteractive"
 
